@@ -1,0 +1,19 @@
+# Dependências
+node_modules/
+
+# Build
+dist/
+
+# Dados gerados pelo scraper (não devem ir para o repositório)
+data.json
+data.csv
+
+# Arquivos de ambiente e logs
+.env
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+
+# Documentos do desafio (não enviar para o repositório)
+desafio_tecnico_trainee_crawler_instruções.pdf
+Descrição da Vaga Trainee.txt

@@ -1,0 +1,23 @@
+# Histórico de Setup e Comandos do Projeto
+
+1. Inicialização do projeto e configuração do ambiente TypeScript:
+npm init -y
+npm install -D typescript @types/node tsx
+npx tsc --init
+
+2. Execução do script inicial:
+npx tsx --watch src/index.ts
+
+3. Configuração de live-reload para o desenvolvimento:
+npm install -D nodemon ts-node
+- O nodemon reinicia a aplicação a cada alteração salva.
+- O ts-node é necessário para o nodemon compilar e rodar o código em TypeScript nativamente.
+
+4. Instalação de dependências para o web scraping:
+npm install axios
+- O axios é responsável por fazer as requisições HTTP para a URL alvo (baixar o conteúdo HTML).
+
+5. Controle de versão com Git:
+- Repositório criado e linkado ao GitHub.
+- Configuração do arquivo .gitignore para não versionar arquivos pesados (node_modules), dados locais gerados (JSON/CSV) e documentos confidenciais do desafio (PDFs e manuais da vaga).
+- Realizado o primeiro commit com a versão funcional do scraper.
