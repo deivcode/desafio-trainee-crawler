@@ -43,3 +43,13 @@ npm install axios
 - Configurada a imagem base node:20-alpine por ser extremamente leve.
 - Adicionada a instrução USER node para garantir a execução do container sem privilégios de root (boas práticas de segurança).
 - Criado o arquivo docker-compose.yml (Bônus do desafio) para rodar a aplicação localmente e mapear o volume, permitindo que os arquivos gerados (CSV/JSON) apareçam na máquina local.
+
+8. Pipeline CI/CD e Documentação Final:
+- Criado pipeline no GitLab (.gitlab-ci.yml) contemplando estágios de lint, teste, build e deploy simulado (exigência do PDF).
+- Adicionado cache inteligente na pipeline para a pasta npm.
+- Elaborado um README.md profissional documentando as decisões e explicando abertamente o uso criativo de IA como Pair Programming.
+
+9. Toques Finais de Criatividade (Diferenciais):
+- Implementado um loop básico para raspagem em múltiplas páginas (Paginação 1 e 2).
+- Adicionada a propriedade "dataColeta" (timestamp) nos arquivos de saída para histórico.
+- Refatorado o terminal com cores usando ANSI escape codes para melhor Experiência do Desenvolvedor (DX).

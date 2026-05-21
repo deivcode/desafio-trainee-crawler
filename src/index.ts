@@ -8,21 +8,27 @@ interface Book {
   preco: number;
   emEstoque: boolean;
   avaliacao: number;
+  dataColeta: string; // Diferencial: Timestamp de quando o dado foi pego
 }
 
 async function rasparSite() {
     try {
-        console.log("⏳ Acessando a livraria e baixando o HTML...");
-        
-        // 1. Aguarda a requisição HTTP baixar o HTML da página alvo
-        const resposta = await axios.get('https://books.toscrape.com/');
-        const $ = cheerio.load(resposta.data);
+        console.log('\x1b[36m%s\x1b[0m', "🚀 Iniciando o robô de extração...");
         
         // Array para armazenar os objetos dos livros extraídos
         const livros: Book[] = [];
 
-        // 2. Itera sobre todos os elementos HTML que representam um livro na listagem
-        $('article.product_pod').each((index, element) => {
+        // Diferencial: Fazendo uma paginação simples (raspando as 2 primeiras páginas)
+        for (let pagina = 1; pagina <= 2; pagina++) {
+            console.log('\x1b[33m%s\x1b[0m', `⏳ Baixando a página ${pagina}...`);
+            
+            // A URL muda de acordo com o número da página no loop
+            const url = `https://books.toscrape.com/catalogue/page-${pagina}.html`;
+            const resposta = await axios.get(url);
+            const $ = cheerio.load(resposta.data);
+
+            // 2. Itera sobre todos os elementos HTML que representam um livro na listagem
+            $('article.product_pod').each((index, element) => {
             
             // Extrai o título (usando o atributo 'title' para evitar pegar o texto truncado/cortado)
             const titulo = $(element).find('h3 a').attr('title') || '';
@@ -45,21 +51,25 @@ async function rasparSite() {
             };
             const avaliacao = mapaNotas[notaEmTexto] || 0;
 
-            // Insere o livro estruturado no nosso array principal
-            livros.push({ titulo, preco, emEstoque, avaliacao });
-        });
+            // Marca o momento exato em que o dado foi extraído
+            const dataColeta = new Date().toISOString();
 
-        console.log(`✅ Extração finalizada! ${livros.length} livros encontrados.`);
+            // Insere o livro estruturado no nosso array principal
+            livros.push({ titulo, preco, emEstoque, avaliacao, dataColeta });
+        });
+        } // Fim do loop de paginação
+
+        console.log('\x1b[32m%s\x1b[0m', `✅ Extração finalizada! ${livros.length} livros encontrados.`);
 
         // 3. Salvando a lista de dados no arquivo JSON
         fs.writeFileSync('data.json', JSON.stringify(livros, null, 2));
         console.log('📦 Arquivo data.json gerado com sucesso!');
 
         // 4. Montando a estrutura e salvando no arquivo CSV
-        const cabecalhoCsv = 'Título,Preço,EmEstoque,Avaliação\n';
-        const linhasCsv = livros.map(l => `"${l.titulo}",${l.preco},${l.emEstoque},${l.avaliacao}`).join('\n');
+        const cabecalhoCsv = 'Título,Preço,EmEstoque,Avaliação,DataColeta\n';
+        const linhasCsv = livros.map(l => `"${l.titulo}",${l.preco},${l.emEstoque},${l.avaliacao},${l.dataColeta}`).join('\n');
         fs.writeFileSync('data.csv', cabecalhoCsv + linhasCsv);
-        console.log('📊 Arquivo data.csv gerado com sucesso!');
+        console.log('\x1b[32m%s\x1b[0m', '📊 Arquivo data.csv gerado com sucesso!');
         
     } catch (erro) {
         // Se o site cair ou houver qualquer erro de rede, o bloco catch segura aqui

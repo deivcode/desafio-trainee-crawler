@@ -21,8 +21,6 @@ roadmap organizado para guiar o desenvolvimento do projeto passo a passo.
   - [x] **Preço** (limpar símbolo monetário e tratar como número)
   - [x] **Avaliação / Rating** (converter classes como `star-rating Three` para o número correspondente `3`)
   - [x] **Disponibilidade** (em estoque ou esgotado)
-  - [ ] **Link de detalhes**
-- [ ] Implementar a lógica de **Paginação** para navegar pelas páginas do site de forma ordenada e segura
 
 ---
 
@@ -61,11 +59,11 @@ roadmap organizado para guiar o desenvolvimento do projeto passo a passo.
 ---
 
 ## 📝 Fase 7: Documentação (README.md)
-- [ ] Escrever guia rápido de instalação e execução (localmente sem Docker e localmente com Docker)
-- [ ] Documentar a estrutura/schema dos dados finais (JSON e CSV)
-- [ ] Explicar conceitualmente cada stage da pipeline CI/CD
-- [ ] Registrar as decisões técnicas tomadas e o porquê de cada escolha
-- [ ] Criar seção dedicada detalhando a utilização de IAs (ChatGPT, Claude, etc.) durante o processo (prompts utilizados, sucessos e aprendizados)
+- [x] Escrever guia rápido de instalação e execução (localmente sem Docker e localmente com Docker)
+- [x] Documentar a estrutura/schema dos dados finais (JSON e CSV)
+- [x] Explicar conceitualmente cada stage da pipeline CI/CD
+- [x] Registrar as decisões técnicas tomadas e o porquê de cada escolha
+- [x] Criar seção dedicada detalhando a utilização de IAs (ChatGPT, Claude, etc.) durante o processo (prompts utilizados, sucessos e aprendizados)
 
 ---
 
