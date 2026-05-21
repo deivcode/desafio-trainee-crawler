@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  scraper:
+    build: .
+    image: desafio-trainee-crawler
+    container_name: trainee-scraper
+    # Adicionamos um volume para que os arquivos JSON e CSV gerados pelo container 
+    # apareçam na nossa pasta local do Windows
+    volumes:
+      - ./:/app
+      # Esse volume anônimo abaixo é o segredo! Ele impede que o node_modules do seu Windows
+      # substitua o node_modules do Linux que o Docker instalou no Alpine.
+      - /app/node_modules
+    # Evita que o volume sobrescreva os node_modules instalados no container
+    volumes_from: []
