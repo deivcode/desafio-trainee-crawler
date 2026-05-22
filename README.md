@@ -47,7 +47,7 @@ O script realiza o scraping da página inicial e salva duas versões do resultad
     "preco": 51.77,
     "emEstoque": true,
     "avaliacao": 3,
-    "dataColeta": "2026-05-21T15:00:00.000Z"
+    "dataColeta": "21/05/2026, 15:00:00"
   }
 ]
 ```
@@ -55,12 +55,12 @@ O script realiza o scraping da página inicial e salva duas versões do resultad
 - `preco` (number): Valor decimal limpo (sem o símbolo £).
 - `emEstoque` (boolean): `true` se estiver "In stock".
 - `avaliacao` (number): Número inteiro representando as estrelas da review (1 a 5).
-- `dataColeta` (string): Timestamp em formato ISO 8601 do momento da raspagem.
+- `dataColeta` (string): Timestamp em formato local de quando a raspagem ocorreu.
 
 **Schema do CSV (`data.csv`)**
 ```csv
-Título,Preço,EmEstoque,Avaliação,DataColeta
-"A Light in the Attic",51.77,true,3,2026-05-21T15:00:00.000Z
+Título;Preço;EmEstoque;Avaliação;DataColeta
+"A Light in the Attic";51.77;true;3;"21/05/2026, 15:00:00"
 ```
 
 ---
@@ -89,9 +89,8 @@ O arquivo `.gitlab-ci.yml` foi desenhado com foco em segurança, cache e deploy 
 
 ## ⏱️ O que eu faria diferente com mais tempo
 
-1. **Scraping Recursivo / Paginação:** Faria o crawler descobrir a URL da próxima página iterando sobre todas as páginas do catálogo até esgotá-las.
-2. **Sistema anti-bot:** Adicionaria cabeçalhos (headers) dinâmicos simulando navegadores diferentes, rotação de proxies e tempos de espera (delays) randômicos.
-3. **Observabilidade (Logs):** Trocaria o simples `console.log` por uma biblioteca de log robusta (como o `Winston` ou `Pino`) para guardar e formatar os logs de execução de forma profissional caso isso rodasse na nuvem.
+1. Utilizaria a API da OpenAI ou gemini para ler o parágrafo da descrição do livro em textos livres e estruturar atributos difíceis de encontrar através de RegEx.
+2. Adoraria ter codado algo que usaria esses dados extraidos, como um dashboard, que pegaria direto os dados ou do csv ou do json ou ate mesmo um site basico em html.
 
 ---
 
@@ -101,8 +100,21 @@ Encarei o uso de IAs generativas como um parceiro de **Pair Programming**.
 Eu me responsabilizei inteiramente pela construção das ideias e pela lógica principal de extração de dados do scraper (mapear os seletores e estruturar as interfaces). 
 
 Enquanto isso, utilizei a IA de forma iterativa para atuar como meu "copiloto" nas tarefas infraestruturais repetitivas:
-- Na organização do documento de projeto e no preenchimento de padrões básicos do `.gitignore`.
-- Na migração de testes, utilizando a IA para debugar e sugerir rapidamente a troca do Jest pelo Vitest por causa da resolução de módulos ESM do Node.
-- Na discussão e validação da minha estrutura de Dockerfile (Multi-stage). A IA me ajudou a identificar e contornar uma falha comum do `docker-compose.yml`, sugerindo um volume anônimo para proteger a pasta `node_modules` do container Linux de sofrer sobrescrita com os binários do Windows local.
 
-Essa abordagem me permitiu focar no negócio (business logic) de web scraping sem esbarrar por horas em problemas pontuais de configuração e ambiente, demonstrando como ferramentas de IA auxiliam na produtividade.
+- Eu primeiramente tive que aprender alguns termos citados para o desafio como CI/CD e Pipeline. O Docker eu já havia utilizado para rodar bancos de dados, mas fiz perguntas pontuais para a IA me relembrar conceitos importantes (como volumes e Multi-stage), além dos vídeos que eu assisti sobre, que também me ajudaram muito.
+- Utilizei o **Antigravity** (IDE com IA Agentic integrada) como meu "caderno inteligente" e assistente de Pair Programming. Usei a plataforma para armazenar minhas ideias, planejar a lógica de negócio estruturada e debater arquiteturas em tempo real, mantendo todo o contexto do projeto centralizado.
+- Na organização do documento de projeto, na estilização que me levaria horas organizando tracinhos para ficar bonito, como os de stage na pipeline, e o todo list que pedi para a IA montar com base no que eu havia digitado. Eu fiz o todo list, mas colocar quadradinhos, emojis e cores eu pedi para a IA.
+- Na discussão e validação da minha estrutura de Dockerfile (Multi-stage). A IA me ajudou a identificar e contornar uma falha comum do `docker-compose.yml`, sugerindo um volume anônimo para proteger a pasta `node_modules` do container Linux de sofrer sobrescrita com os binários do Windows local.
+- Na criação dos testes unitários do Node.js. Como minha experiência prévia com testes era mais focada em Frontend (E2E com Cypress), utilizei a IA para entender a sintaxe do framework Vitest e estruturar os testes das funções utilitárias (Backend).
+
+**O que não funcionou de primeira:**
+Quando tentei pedir para a IA gerar o código completo da raspagem de uma vez só, o código falhava, pois a IA não tinha o contexto exato do HTML do site. Tive que recuar e mapear os seletores (`article.product_pod`, `.price_color`) manualmente pelo DevTools do navegador.
+
+**Exemplos de Prompts utilizados:**
+- *"Me explique como funciona uma Pipeline CI/CD no GitLab de forma simples e com analogias reais."*
+- *"Como estruturar um Dockerfile com multi-stage build para uma aplicação Node.js rodando sem permissão de root?"*
+- *"Como posso consertar o erro de EBUSY no Node.js ao tentar reescrever um arquivo CSV no Windows?"*
+- *"Formate este texto bruto de requisitos em uma lista de tarefas (TODO list) com marcações Markdown e Emojis."*
+- *"Como escrevo um teste unitário básico no Vitest para uma função em Node.js? Estou mais acostumado com testes E2E no Cypress."*
+
+Essa abordagem me permitiu focar no negócio de web scraping sem esbarrar por horas em problemas pontuais de configuração e ambiente, demonstrando como ferramentas de IA auxiliam na produtividade.

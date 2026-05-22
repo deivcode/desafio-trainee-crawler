@@ -29,8 +29,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/src ./src
 
-# Exposição da porta (O PDF exige isso como critério. Como não temos um servidor web rodando, 
-# definimos a porta 8080 simbolicamente para atender à exigência do desafio)
+# Exposição de porta padrão (apenas para cumprir os requisitos da infraestrutura/avaliação, 
+# já que este container atua como um CLI/Worker e não possui servidor HTTP ativo)
 EXPOSE 8080
 
 # Troca para o usuário 'node' que é não-root (critério exigido por segurança)

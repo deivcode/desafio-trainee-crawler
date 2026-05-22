@@ -63,11 +63,5 @@ roadmap organizado para guiar o desenvolvimento do projeto passo a passo.
 - [x] Documentar a estrutura/schema dos dados finais (JSON e CSV)
 - [x] Explicar conceitualmente cada stage da pipeline CI/CD
 - [x] Registrar as decisões técnicas tomadas e o porquê de cada escolha
-- [x] Criar seção dedicada detalhando a utilização de IAs (ChatGPT, Claude, etc.) durante o processo (prompts utilizados, sucessos e aprendizados)
+- [x] Criar seção dedicada detalhando a utilização de IAs
 
----
-
-## 🏆 Fase 8: Bônus e Diferenciais (Opcionais)
-- [ ] *Bônus 1:* Implementar automação dinâmica de navegador com **Playwright**
-- [ ] *Bônus 2:* Integrar com uma API de LLM para extrair dados estruturados adicionais das descrições dos livros
-- [ ] *Bônus 3:* Criar um arquivo `docker-compose.yml` para inicializar o scraper junto a uma base de dados local para persistência direta

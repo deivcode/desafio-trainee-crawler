@@ -1,63 +1,54 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
+import { limparPreco, verificarEstoque, converterAvaliacaoParaNumero } from './utils.js';
 
 // Definimos o contrato do nosso objeto Livro usando o TypeScript
 interface Book {
-  titulo: string;
-  preco: number;
-  emEstoque: boolean;
-  avaliacao: number;
-  dataColeta: string; // Diferencial: Timestamp de quando o dado foi pego
+    titulo: string;
+    preco: number;
+    emEstoque: boolean;
+    avaliacao: number;
+    dataColeta: string; // Adicionado para manter o histórico temporal da coleta (útil para versionamento e Data Lakes)
 }
 
-async function rasparSite() {
+async function extrairDados() {
     try {
-        console.log('\x1b[36m%s\x1b[0m', "🚀 Iniciando o robô de extração...");
-        
+        console.log('\x1b[36m%s\x1b[0m', "🚀 Iniciando o robô Ronaldo o extrator de dados ...");
+
         // Array para armazenar os objetos dos livros extraídos
         const livros: Book[] = [];
 
-        // Diferencial: Fazendo uma paginação simples (raspando as 2 primeiras páginas)
+        //  Paginação simples usando .map
+
         for (let pagina = 1; pagina <= 2; pagina++) {
             console.log('\x1b[33m%s\x1b[0m', `⏳ Baixando a página ${pagina}...`);
             
-            // A URL muda de acordo com o número da página no loop
-            const url = `https://books.toscrape.com/catalogue/page-${pagina}.html`;
-            const resposta = await axios.get(url);
+            // Ética de Scraping: Delay de 1.5s entre as requisições para não sobrecarregar o servidor
+            if (pagina > 1) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+
+            // Ética de Scraping: Enviando um User-Agent identificável, conforme exigido nas regras
+            const resposta = await axios.get(`https://books.toscrape.com/catalogue/page-${pagina}.html`, {
+                headers: {
+                    'User-Agent': 'Robo-Trainee-Devnology/1.0 (+https://github.com/deivcode)'
+                }
+            });
             const $ = cheerio.load(resposta.data);
 
-            // 2. Itera sobre todos os elementos HTML que representam um livro na listagem
-            $('article.product_pod').each((index, element) => {
-            
-            // Extrai o título (usando o atributo 'title' para evitar pegar o texto truncado/cortado)
-            const titulo = $(element).find('h3 a').attr('title') || '';
+            //  Transforma o HTML direto em um array de objetos Book utilizando as funções puras de utilitários
+            const livrosDessaPagina: Book[] = $('article.product_pod').map((_, el) => ({
+                titulo: $(el).find('h3 a').attr('title') || '',
+                preco: limparPreco($(el).find('.price_color').text()),
+                emEstoque: verificarEstoque($(el).find('.instock.availability').text()),
+                avaliacao: converterAvaliacaoParaNumero($(el).find('p.star-rating').attr('class') || ''),
+                dataColeta: new Date().toLocaleString('pt-BR')
+            })).get();
 
-            // Extrai o Preço, remove o símbolo da libra (£) e converte para número decimal
-            const textoPreco = $(element).find('.price_color').text();
-            const preco = parseFloat(textoPreco.replace('£', ''));
-
-            // Verifica a disponibilidade em estoque (limpando espaços em branco com trim)
-            const textoDisponibilidade = $(element).find('.instock.availability').text().trim();
-            const emEstoque = textoDisponibilidade === 'In stock';
-
-            // Extrai a classe da estrela (ex: "star-rating Three") para isolar a nota
-            const classeEstrela = $(element).find('p.star-rating').attr('class') || '';
-            const notaEmTexto = classeEstrela.split(' ')[1]; // Isola a segunda palavra da classe
-            
-            // Dicionário para mapear as notas em texto para valores numéricos inteiros
-            const mapaNotas: Record<string, number> = {
-                'One': 1, 'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5
-            };
-            const avaliacao = mapaNotas[notaEmTexto] || 0;
-
-            // Marca o momento exato em que o dado foi extraído
-            const dataColeta = new Date().toISOString();
-
-            // Insere o livro estruturado no nosso array principal
-            livros.push({ titulo, preco, emEstoque, avaliacao, dataColeta });
-        });
-        } // Fim do loop de paginação
+            // Despeja os livros dessa página dentro do array principal
+            livros.push(...livrosDessaPagina);
+        }
 
         console.log('\x1b[32m%s\x1b[0m', `✅ Extração finalizada! ${livros.length} livros encontrados.`);
 
@@ -66,11 +57,13 @@ async function rasparSite() {
         console.log('📦 Arquivo data.json gerado com sucesso!');
 
         // 4. Montando a estrutura e salvando no arquivo CSV
-        const cabecalhoCsv = 'Título,Preço,EmEstoque,Avaliação,DataColeta\n';
-        const linhasCsv = livros.map(l => `"${l.titulo}",${l.preco},${l.emEstoque},${l.avaliacao},${l.dataColeta}`).join('\n');
-        fs.writeFileSync('data.csv', cabecalhoCsv + linhasCsv);
+        // Usamos ponto e vírgula (;) porque o Excel no Brasil se confunde com vírgulas normais
+        const cabecalhoCsv = 'Título;Preço;EmEstoque;Avaliação;DataColeta\n';
+        const linhasCsv = livros.map(l => `"${l.titulo}";${l.preco};${l.emEstoque};${l.avaliacao};"${l.dataColeta}"`).join('\n');
+        // O '\ufeff' é o BOM (Byte Order Mark). Ele diz para o Excel que o arquivo é UTF-8, corrigindo os acentos (Ç, ~)
+        fs.writeFileSync('data.csv', '\ufeff' + cabecalhoCsv + linhasCsv);
         console.log('\x1b[32m%s\x1b[0m', '📊 Arquivo data.csv gerado com sucesso!');
-        
+
     } catch (erro) {
         // Se o site cair ou houver qualquer erro de rede, o bloco catch segura aqui
         console.error("❌ Erro crítico ao processar o scraping:", erro);
@@ -78,4 +71,4 @@ async function rasparSite() {
 }
 
 // Inicia a execução do robô
-rasparSite();
+extrairDados();
